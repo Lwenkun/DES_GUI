@@ -249,16 +249,14 @@ unit64 pc_1(unit64 init_key) {
 }
 
 // init keys
-void init_key(unit64 init_key, unit64 out_key[], bool encrypt) {
+void init_keys(unit64 init_key, unit64 out_keys[], bool encrypt) {
     
     unit64 pc_1_result = pc_1(init_key);
     unit32 C = (unit32) ((pc_1_result >> 28) & 0xfffffff);
     unit32 D = (unit32) (pc_1_result & 0xfffffff);
     
     long tmp_key = 0L;
-    
-    
-    
+
     for (int i = 0; i < 16; i++) {
         
         int shift = table_keyShift[i];
@@ -270,9 +268,9 @@ void init_key(unit64 init_key, unit64 out_key[], bool encrypt) {
         tmp_key |= D;
         
         if (encrypt) {
-            out_key[i] = pc_2(tmp_key);
+            out_keys[i] = pc_2(tmp_key);
         } else  {
-            out_key[15 - i] = pc_2(tmp_key);
+            out_keys[15 - i] = pc_2(tmp_key);
         }
         tmp_key = 0L; // don't forget clear tmp_key for next iteration
     }
@@ -335,7 +333,6 @@ void _des(string input_file, string output_file, string hex_key, bool encrypt) {
     
     ifstream* reader = new ifstream(input_file, ios_base::in|ios_base::binary);
     ofstream* writer = new ofstream(output_file, ios_base::out|ios_base::binary);
-    
     // read or write buffer
     byte buf[8];
     byte buf2[8];
@@ -347,16 +344,15 @@ void _des(string input_file, string output_file, string hex_key, bool encrypt) {
     unit64 origin, key, permuted_input, result = 0L;
     unit32 L, R;
     unit32 tmp; // used to change L and R
-    unit64 out_key[16];
+    unit64 keys[16];
     bool padding_added = false;
     // we should init_key before encrypting/dencrypting
-    init_key(initial_key, out_key, encrypt);
+    init_keys(initial_key, keys, encrypt);
     // size of bytes that we really get from file
     int size = read(reader, bufptr);
     
     while (size > 0 || !padding_added) {
         if (size < 8) {
-            //  padding_size = 8 - size;
             add_padding(bufptr, 8, size);
             padding_added = true;
         }
@@ -364,14 +360,14 @@ void _des(string input_file, string output_file, string hex_key, bool encrypt) {
         origin = byte2unit64(bufptr);
         // apply ip transformation
         permuted_input = ip(origin, false);
-        // get the lower 32 bits as L
+        // get the lower 32 bits as R
         R = (unit32) permuted_input;
-        // get the higher 32 bits as R
+        // get the higher 32 bits as L
         L = (unit32) (permuted_input >> 32);
         // 16 iterations
         for (int i = 0; i < 16; i++) {
             // get key for i th iteration
-            key = out_key[i];
+            key = keys[i];
             // we should store R for it will be override later
             tmp = R;
             // apply f transformation

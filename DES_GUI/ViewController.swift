@@ -19,9 +19,12 @@ class ViewController: NSViewController {
     @IBOutlet weak var passwordTextField: NSTextField!
     @IBOutlet weak var outputFilePathTextField: NSTextField!
     
+    @IBOutlet weak var paddingTypeSelection: NSPopUpButton!
+    @IBOutlet weak var encryptionModeSelection: NSPopUpButton!
     @IBOutlet weak var typeSelection: NSPopUpButton!
     @IBOutlet weak var indicator: NSProgressIndicator!
     
+    @IBOutlet weak var test: NSButton!
     
     @IBOutlet weak var noticeTextField: NSTextField!
     var open: NSOpenPanel!
@@ -30,8 +33,13 @@ class ViewController: NSViewController {
         super.viewDidLoad()
         typeSelection.removeAllItems()
         typeSelection.addItems(withTitles: ["加密", "解密"])
+        encryptionModeSelection.removeAllItems()
+        encryptionModeSelection.addItem(withTitle: "ECB")
+        passwordTextField.placeholderString = "0000000000000000"
+        paddingTypeSelection.removeAllItems()
+        paddingTypeSelection.addItem(withTitle: "PKCS5")
         indicator.isHidden = true;
-        // Do any additional setup after loading the view.
+        
     }
     
     @IBAction func selectInputFile(_ sender: Any) {
@@ -79,6 +87,11 @@ class ViewController: NSViewController {
         let inputFilePath = inputFilePathTextField.stringValue
         let outputFilePath = outputFilePathTextField.stringValue
         let hexKey = passwordTextField.stringValue
+        
+        if !FileManager.default.fileExists(atPath: inputFilePath) {
+            
+        }
+        
         startButton.isEnabled = false
         if typeSelection.selectedItem?.title == "加密" {
             onTaskStart(encrypt: true)
@@ -94,6 +107,7 @@ class ViewController: NSViewController {
             }).start()
         }
     }
+    
     
     func onTaskStart(encrypt: Bool) -> Void {
         noticeTextField.stringValue = encrypt ? "正在加密..." : "正在解密..."

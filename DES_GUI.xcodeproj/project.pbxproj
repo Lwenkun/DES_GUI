@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		94575EB11EC70BE5003DF772 /* DES.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94575EB01EC70BE5003DF772 /* DES.swift */; };
 		94575F241EC75F12003DF772 /* des.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 94575F231EC75F12003DF772 /* des.cpp */; };
 		94575F271EC7657F003DF772 /* OCDesBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = 94575F261EC7657F003DF772 /* OCDesBridge.mm */; };
 		94575F291EC76A39003DF772 /* des.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 94575F1E1EC755EE003DF772 /* des.hpp */; };
@@ -37,7 +36,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		94575EB01EC70BE5003DF772 /* DES.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DES.swift; sourceTree = "<group>"; };
 		94575F1E1EC755EE003DF772 /* des.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = des.hpp; sourceTree = "<group>"; };
 		94575F221EC75F11003DF772 /* DES_GUI-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "DES_GUI-Bridging-Header.h"; sourceTree = "<group>"; };
 		94575F231EC75F12003DF772 /* des.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = des.cpp; sourceTree = "<group>"; };
@@ -112,7 +110,6 @@
 				94C266311EC5D98A00C0AD0B /* Assets.xcassets */,
 				94C266331EC5D98A00C0AD0B /* Main.storyboard */,
 				94C266361EC5D98A00C0AD0B /* Info.plist */,
-				94575EB01EC70BE5003DF772 /* DES.swift */,
 				94575F231EC75F12003DF772 /* des.cpp */,
 				94575F221EC75F11003DF772 /* DES_GUI-Bridging-Header.h */,
 				94575F251EC76281003DF772 /* OCDesBridge.h */,
@@ -287,7 +284,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				94575EB11EC70BE5003DF772 /* DES.swift in Sources */,
 				94C266301EC5D98A00C0AD0B /* ViewController.swift in Sources */,
 				94575F271EC7657F003DF772 /* OCDesBridge.mm in Sources */,
 				94575F241EC75F12003DF772 /* des.cpp in Sources */,
