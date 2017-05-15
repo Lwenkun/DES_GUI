@@ -95,14 +95,14 @@ class ViewController: NSViewController {
         print("task started !");
         let inputFilePath = inputFilePathTextField.stringValue
         let outputFilePath = outputFilePathTextField.stringValue
-        let hexKey = passwordTextField.stringValue
+        let hexKey = passwordTextField.stringValue.isEmpty ? passwordTextField.placeholderString : passwordTextField.stringValue
         
         var error: String!
         if !FileManager.default.fileExists(atPath: inputFilePath) {
             error = "输入文件不存在！"
         } else if !isDirectoryValid(key: outputFilePath) {
             error = "输出目录不存在！"
-        } else if !isKeyValid(key: hexKey) {
+        } else if !isKeyValid(key: hexKey!) {
             error = "请输入有效的密钥！"
         }
         
@@ -120,13 +120,13 @@ class ViewController: NSViewController {
         if typeSelection.selectedItem?.title == "加密" {
             onTaskStart(encrypt: true)
             Thread(block: {() -> () in
-                self.encrypt(inputFilePath: inputFilePath, outputFilePath: outputFilePath, hexKey: hexKey)
+                self.encrypt(inputFilePath: inputFilePath, outputFilePath: outputFilePath, hexKey: hexKey!)
                 self.onTaskOver(encrypt: true)
                 }).start()
         } else {
             onTaskStart(encrypt: false)
             Thread(block: {() -> () in
-                self.decrypt(inputFilePath: inputFilePath, outputFilePath: outputFilePath, hexKey: hexKey)
+                self.decrypt(inputFilePath: inputFilePath, outputFilePath: outputFilePath, hexKey: hexKey!)
                 self.onTaskOver(encrypt: false)
             }).start()
         }
