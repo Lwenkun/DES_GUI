@@ -28,17 +28,26 @@ class ViewController: NSViewController {
     
     @IBOutlet weak var noticeTextField: NSTextField!
     var open: NSOpenPanel!
+    let alert = NSAlert();
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         typeSelection.removeAllItems()
         typeSelection.addItems(withTitles: ["加密", "解密"])
+        
         encryptionModeSelection.removeAllItems()
         encryptionModeSelection.addItem(withTitle: "ECB")
+        
         passwordTextField.placeholderString = "0000000000000000"
+        
         paddingTypeSelection.removeAllItems()
         paddingTypeSelection.addItem(withTitle: "PKCS5")
+        
         indicator.isHidden = true;
+        
+        alert.alertStyle = NSAlertStyle.warning;
+        alert.messageText = "错误！";
         
     }
     
@@ -88,8 +97,23 @@ class ViewController: NSViewController {
         let outputFilePath = outputFilePathTextField.stringValue
         let hexKey = passwordTextField.stringValue
         
+        var error: String!
         if !FileManager.default.fileExists(atPath: inputFilePath) {
-            
+            error = "输入文件不存在！"
+        } else if !isDirectoryValid(key: outputFilePath) {
+            error = "输出目录不存在！"
+        } else if !isKeyValid(key: hexKey) {
+            error = "请输入有效的密钥！"
+        }
+        
+        if error != nil {
+            alert.informativeText = error
+            alert.beginSheetModal(for: NSApplication.shared().mainWindow!, completionHandler: { (modalResponse) -> Void in
+                if modalResponse == NSAlertFirstButtonReturn {
+                    print("Document deleted")
+                }
+            })
+            return;
         }
         
         startButton.isEnabled = false
@@ -108,6 +132,26 @@ class ViewController: NSViewController {
         }
     }
     
+    func isDirectoryValid(key: String) -> Bool {
+        let range = key.range(of: "/", options: String.CompareOptions.backwards, range: nil, locale: Locale.current)
+        if range == nil {
+            return false;
+        }
+        let directory = key.substring(to: (range?.lowerBound)!)
+        return FileManager.default.fileExists(atPath: directory)
+    }
+    
+    func isKeyValid(key: String) -> Bool {
+        if (key.utf8.count != 16) {
+            return false
+        }
+        for a:Character in key.characters {
+            if (a < "a" || a > "f") && (a < "A" || a > "F") && (a < "0" || a > "9") {
+                return false
+            }
+        }
+        return true
+    }
     
     func onTaskStart(encrypt: Bool) -> Void {
         noticeTextField.stringValue = encrypt ? "正在加密..." : "正在解密..."
