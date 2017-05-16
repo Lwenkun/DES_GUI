@@ -11,10 +11,6 @@
 #include "des.hpp"
 
 typedef char byte;
-typedef unsigned long unit64;
-typedef unsigned int unit32;
-typedef unsigned char unit8;
-
 
 using namespace std;
 
@@ -42,7 +38,6 @@ int table_ip[] = {
     59, 51, 43, 35, 27, 19, 11, 3,
     61, 53, 45, 37, 29, 21, 13, 5,
     63, 55, 47, 39, 31, 23, 15, 7
-    
 };
 
 int table_reverse_ip[] = {
@@ -158,11 +153,11 @@ void msg(string msg) {
 }
 
 
-unit64 ip(unit64 raw, bool inverse) {
+uint64_t ip(uint64_t raw, bool inverse) {
     int* table = inverse ? table_reverse_ip : table_ip;
-    unit32 table_ip_size = 64; // size of table_ip is 64
-    unit64 result = 0L;
-    unit64 mask = 1L << 63;
+    uint32_t table_ip_size = 64; // size of table_ip is 64
+    uint64_t result = 0L;
+    uint64_t mask = 1L << 63;
     for (int i = 0; i < table_ip_size; i++) {
         // retrieve the bit in raw data at the position represented by table[i]
         if ((raw & (mask >> (table[i] - 1))) != 0) {
@@ -175,11 +170,11 @@ unit64 ip(unit64 raw, bool inverse) {
 // expand R to 48 bits length according to table_E
 // we cannot find a data type of size 48, so we use unit64,
 // the lower 48 bits is valid
-unit64 E(int raw) {
-    unit32 table_E_size = 48; // size of table_E is 48
-    unit64 result = 0L;
-    unit32 int_mask = 1 << 31;
-    unit64 long_mask = 1L << 47; // put the mask at the first position
+uint64_t E(uint32_t raw) {
+    uint32_t table_E_size = 48; // size of table_E is 48
+    uint64_t result = 0L;
+    uint32_t int_mask = 1 << 31;
+    uint64_t long_mask = 1L << 47; // put the mask at the first position
     for (int i = 0; i < table_E_size; i++) {
         if ((raw & (int_mask >> (table_E[i] - 1))) != 0) {
             result |= (long_mask >> i);
@@ -199,10 +194,10 @@ byte S(byte input, int n) {
     return (byte) table_s[n][x][y];
 }
 
-unit32 P(int raw) {
+uint32_t P(uint32_t raw) {
     int table_p_size = 32;
-    unit32 result = 0;
-    unit32 mask = (1 << 31);
+    uint32_t result = 0;
+    uint32_t mask = (1 << 31);
     for (int i = 0; i < table_p_size; i++) {
         if ((raw & (mask >> (table_P[i] - 1))) != 0) {
             result |= (mask >> i);
@@ -212,10 +207,10 @@ unit32 P(int raw) {
 }
 
 // R has 32 bits, and only use lower 48 bits of key
-unit32 f(int R, long key) {
-    unit64 expanded_R = E(R); // expand R to 48 bits
-    unit64 s_input = expanded_R ^ key; // (R, K) -> S
-    unit32 p_input = 0;
+uint32_t f(uint32_t R, uint64_t key) {
+    uint64_t expanded_R = E(R); // expand R to 48 bits
+    uint64_t s_input = expanded_R ^ key; // (R, K) -> S
+    uint32_t p_input = 0;
     for (int i = 0, shift = 42; i < 8; i++, shift -= 6) {
         p_input <<= 4;
         // only use lower 6 bits of s_input and lower 4 bits of the result
@@ -225,10 +220,10 @@ unit32 f(int R, long key) {
 }
 
 
-unit64 pc_2(unit64 raw) {
+uint64_t pc_2(uint64_t raw) {
     
-    unit64 result = 0L;
-    unit64 mask = 1L << 55;
+    uint64_t result = 0L;
+    uint64_t mask = 1L << 55;
     for (int i = 0; i < 48; i++) {
         if ((raw & (mask >> (table_pc2[i] - 1))) != 0) {
             result |= (mask >> (i + 8));
@@ -237,9 +232,9 @@ unit64 pc_2(unit64 raw) {
     return result;
 }
 
-unit64 pc_1(unit64 init_key) {
-    unit64 result = 0L;
-    unit64 mask = 1L << 63;
+uint64_t pc_1(uint64_t init_key) {
+    uint64_t result = 0L;
+    uint64_t mask = 1L << 63;
     for (int i = 0; i < 56; i++) {
         if ((init_key & (mask >> (table_pc1[i] - 1))) != 0) {
             result |= (mask >> (i + 8));
@@ -249,11 +244,11 @@ unit64 pc_1(unit64 init_key) {
 }
 
 // init keys
-void init_keys(unit64 init_key, unit64 out_keys[], bool encrypt) {
+void init_keys(uint64_t init_key, uint64_t out_keys[], bool encrypt) {
     
-    unit64 pc_1_result = pc_1(init_key);
-    unit32 C = (unit32) ((pc_1_result >> 28) & 0xfffffff);
-    unit32 D = (unit32) (pc_1_result & 0xfffffff);
+    uint64_t pc_1_result = pc_1(init_key);
+    uint32_t C = (uint32_t) ((pc_1_result >> 28) & 0xfffffff);
+    uint32_t D = (uint32_t) (pc_1_result & 0xfffffff);
     
     long tmp_key = 0L;
 
@@ -292,8 +287,8 @@ void add_padding(byte data[], int full_size, int curr_size) {
 }
 
 // size : size of this array
-unit64 byte2unit64(byte data[]) {
-    long result = 0L;
+uint64_t bytes2uint64(byte data[]) {
+    uint64_t result = 0L;
     for (int i = 0; i < 8; i++) {
         result <<= 8;
         result |= (data[i] & 0xff); // because data[i] is a signed char
@@ -301,7 +296,7 @@ unit64 byte2unit64(byte data[]) {
     return result;
 }
 
-void unit642bytes(unit64 data, byte out_bytes[]) {
+void uint642bytes(uint64_t data, byte out_bytes[]) {
     for (int i = 7, shift = 0; i >= 0; i--, shift += 8) {
         out_bytes[i] = (byte) (data >> shift);
     }
@@ -311,8 +306,8 @@ void write(ofstream* writer, byte data[], int size) {
     writer->write(data, size);
 }
 
-unit64 stringToUnit64(string hex_key) {
-    unit64 binary_key = 0L;
+uint64_t stringToUnit64(string hex_key) {
+    uint64_t binary_key = 0L;
     for (int i = 0; i < hex_key.length(); i++) {
         binary_key <<= 4;
         char& c = hex_key.at(i);
@@ -340,11 +335,11 @@ void _des(string input_file, string output_file, string hex_key, bool encrypt) {
     byte* emptybufptr = buf2;
     byte* tmpptr; // used for exchange
     // initial key , using a long number to store it
-    unit64 initial_key = stringToUnit64(hex_key);
-    unit64 origin, key, permuted_input, result = 0L;
-    unit32 L, R;
-    unit32 tmp; // used to change L and R
-    unit64 keys[16];
+    uint64_t initial_key = stringToUnit64(hex_key);
+    uint64_t origin, key, permuted_input, result = 0L;
+    uint32_t L, R;
+    uint32_t tmp; // used to change L and R
+    uint64_t keys[16];
     bool padding_added = false;
     // we should init_key before encrypting/dencrypting
     init_keys(initial_key, keys, encrypt);
@@ -357,13 +352,13 @@ void _des(string input_file, string output_file, string hex_key, bool encrypt) {
             padding_added = true;
         }
         // convert bytes to unit64, this is initial input
-        origin = byte2unit64(bufptr);
+        origin = bytes2uint64(bufptr);
         // apply ip transformation
         permuted_input = ip(origin, false);
         // get the lower 32 bits as R
-        R = (unit32) permuted_input;
+        R = (uint32_t) permuted_input;
         // get the higher 32 bits as L
-        L = (unit32) (permuted_input >> 32);
+        L = (uint32_t) (permuted_input >> 32);
         // 16 iterations
         for (int i = 0; i < 16; i++) {
             // get key for i th iteration
@@ -381,17 +376,15 @@ void _des(string input_file, string output_file, string hex_key, bool encrypt) {
         result |= (L & 0xffffffffL);
         // apply inverse_ip transformation
         result = ip(result, true);
-        
+        // pre-read next buf
         size = read(reader, emptybufptr);
-        
         // convert unit64 to bytes
-        unit642bytes(result, bufptr);
+        uint642bytes(result, bufptr);
         
         if (!encrypt && size == 0) {
             writer->write(bufptr, 8 - bufptr[7]);
             break;
         }
-    
         // don't forget to clear result for next iteration
         result = 0L;
         write(writer, bufptr, 8);

@@ -24,8 +24,6 @@ class ViewController: NSViewController {
     @IBOutlet weak var typeSelection: NSPopUpButton!
     @IBOutlet weak var indicator: NSProgressIndicator!
     
-    @IBOutlet weak var test: NSButton!
-    
     @IBOutlet weak var noticeTextField: NSTextField!
     var open: NSOpenPanel!
     let alert = NSAlert();
@@ -44,10 +42,10 @@ class ViewController: NSViewController {
         paddingTypeSelection.removeAllItems()
         paddingTypeSelection.addItem(withTitle: "PKCS5")
         
-        indicator.isHidden = true;
+        indicator.isHidden = true
         
         alert.alertStyle = NSAlertStyle.warning;
-        alert.messageText = "错误！";
+        alert.messageText = "错误！"
         
     }
     
@@ -113,7 +111,7 @@ class ViewController: NSViewController {
                     print("Document deleted")
                 }
             })
-            return;
+            return
         }
         
         startButton.isEnabled = false
@@ -135,7 +133,7 @@ class ViewController: NSViewController {
     func isDirectoryValid(key: String) -> Bool {
         let range = key.range(of: "/", options: String.CompareOptions.backwards, range: nil, locale: Locale.current)
         if range == nil {
-            return false;
+            return false
         }
         let directory = key.substring(to: (range?.lowerBound)!)
         return FileManager.default.fileExists(atPath: directory)
